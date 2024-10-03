@@ -92,8 +92,17 @@ if (isset($_POST['action'])) {
 /**
  * Select all tasks from the database.
  */
-$selectQuery = ''; // IMPLEMENT ME
+// new implementation
+$selectQuery = "SELECT * FROM tasks";
 $items = $db->query($selectQuery);
+
+// Vérifiez s'il y a des erreurs dans la requête
+if(!$items) {
+    die(print_r($db->errorInfo(), true));
+}
+
+// Récupérer toutes les tâches sous forme de tableau associatif
+$tasks = $items->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <html>
