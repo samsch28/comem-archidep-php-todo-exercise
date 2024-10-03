@@ -63,22 +63,30 @@ if (isset($_POST['action'])) {
     /**
      * Delete a task, then redirect to the base URL.
      */
-    case 'delete':
+    // New implementation
+    case 'delete': 
+      $id = $_POST['id']; if(is_numeric($id)) { 
 
-      $id = $_POST['id'];
-      if(is_numeric($id)) {
-        $deleteQuery = ''; // IMPLEMENT ME
-        if(!$db->query($deleteQuery)) {
-          die(print_r($db->errorInfo(), true));
-        }
-      }
+      // Requête pour supprimer la tâche correspondant à l'ID donné
+      $deleteQuery = "DELETE FROM tasks WHERE id = :id"; 
 
-      header('Location: '.BASE_URL);
-      die();
+      // Préparer la requête pour éviter les injections SQL
+      $stmt = $db->prepare($deleteQuery); 
+      $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
-    default:
+      // Exécuter la requête et vérifier les erreurs 
+      if(!$stmt->execute()) {
+
+      die(print_r($stmt->errorInfo(), true));
+
+    } 
+      
+  } header('Location: '.BASE_URL); 
+      die(); 
+      
+      default:
       break;
-  }
+      }
 }
 
 /**
