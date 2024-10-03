@@ -45,7 +45,7 @@ if (isset($_POST['action'])) {
       $id = $_POST['id'];
       if(is_numeric($id)) {
         $updateQuery = '
-         UPDATE tasks 
+         UPDATE todo
          SET done = CASE WHEN done = 1 THEN 0 ELSE 1 END 
          WHERE id = :id
         '; 
@@ -68,7 +68,7 @@ if (isset($_POST['action'])) {
       $id = $_POST['id']; if(is_numeric($id)) { 
 
       // Requête pour supprimer la tâche correspondant à l'ID donné
-      $deleteQuery = "DELETE FROM tasks WHERE id = :id"; 
+      $deleteQuery = "DELETE FROM todo WHERE id = :id"; 
 
       // Préparer la requête pour éviter les injections SQL
       $stmt = $db->prepare($deleteQuery); 
@@ -93,7 +93,7 @@ if (isset($_POST['action'])) {
  * Select all tasks from the database.
  */
 // new implementation
-$selectQuery = "SELECT * FROM tasks";
+$selectQuery = "SELECT * FROM todo";
 $items = $db->query($selectQuery);
 
 // Vérifiez s'il y a des erreurs dans la requête
