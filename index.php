@@ -44,7 +44,14 @@ if (isset($_POST['action'])) {
 
       $id = $_POST['id'];
       if(is_numeric($id)) {
-        $updateQuery = ''; // IMPLEMENT ME
+        $updateQuery = '
+         UPDATE tasks 
+         SET done = CASE WHEN done = 1 THEN 0 ELSE 1 END 
+         WHERE id = :id
+        '; 
+        $stmt = $db->prepare($updateQuery);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        // New implementation
         if(!$db->query($updateQuery)) {
           die(print_r($db->errorInfo(), true));
         }
