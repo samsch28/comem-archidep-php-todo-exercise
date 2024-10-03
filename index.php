@@ -24,16 +24,16 @@ if (isset($_POST['action'])) {
      * Insert a new task into the database, then redirect to the base URL.
      */
     case 'new':
-
       $title = $_POST['title'];
       if ($title && $title !== '') {
-        $insertQuery = 'INSERT INTO todo VALUES(NULL, \''.$title.'\', FALSE, CURRENT_TIMESTAMP)';
-        if (!$db->query($insertQuery)) {
-          die(print_r($db->errorInfo(), true));
-        }
+      $insertQuery = 'INSERT INTO todo (title, done, created_at) VALUES (:title, 0, CURRENT_TIMESTAMP)';
+      $stmt = $db->prepare($insertQuery); 
+      $stmt->bindParam(':title', $title, PDO::PARAM_STR); 
+      if (!$stmt->execute()) {
+      die(print_r($stmt->errorInfo(), true)); 
+      } 
       }
-
-      header('Location: '.BASE_URL);
+      header('Location: ' . BASE_URL);
       die();
 
     /**
@@ -41,68 +41,76 @@ if (isset($_POST['action'])) {
      * then redirect to the base URL.
      */
     case 'toggle':
-
       $id = $_POST['id'];
-      if(is_numeric($id)) {
-        $updateQuery = '
-         UPDATE todo
-         SET done = CASE WHEN done = 1 THEN 0 ELSE 1 END 
-         WHERE id = :id
-        '; 
+      if (is_numeric($id)) {
+        // Requête pour inverser l'état de la tâche (done/non done)
+        $updateQuery = 'UPDATE todo SET done = CASE WHEN done = 1 THEN 0 ELSE 1 END WHERE id = :id';
+        
+        // Préparation de la requête
         $stmt = $db->prepare($updateQuery);
+        
+        // Liaison du paramètre :id avec la variable $id
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        // New implementation
-        if(!$db->query($updateQuery)) {
-          die(print_r($db->errorInfo(), true));
+        
+        // Exécution de la requête et gestion des erreurs
+        if (!$stmt->execute()) {
+          die(print_r($stmt->errorInfo(), true));
         }
       }
-
-      header('Location: '.BASE_URL);
+    
+      // Redirection vers la page principale après le traitement
+      header('Location: ' . BASE_URL);
       die();
+    
 
     /**
      * Delete a task, then redirect to the base URL.
      */
     // New implementation
-    case 'delete': 
-      $id = $_POST['id']; if(is_numeric($id)) { 
-
-      // Requête pour supprimer la tâche correspondant à l'ID donné
-      $deleteQuery = "DELETE FROM todo WHERE id = :id"; 
-
-      // Préparer la requête pour éviter les injections SQL
-      $stmt = $db->prepare($deleteQuery); 
-      $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-      // Exécuter la requête et vérifier les erreurs 
-      if(!$stmt->execute()) {
-
-      die(print_r($stmt->errorInfo(), true));
-
-    } 
-      
-  } header('Location: '.BASE_URL); 
-      die(); 
-      
-      default:
-      break;
+    case 'delete':
+      $id = $_POST['id'];
+      if (is_numeric($id)) {
+        // Requête pour supprimer la tâche correspondant à l'ID donné
+        $deleteQuery = 'DELETE FROM todo WHERE id = :id';
+        
+        // Préparation de la requête
+        $stmt = $db->prepare($deleteQuery);
+        
+        // Liaison du paramètre :id avec la variable $id
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        
+        // Exécution de la requête et gestion des erreurs
+        if (!$stmt->execute()) {
+          die(print_r($stmt->errorInfo(), true));
+        }
       }
-}
+    
+      // Redirection vers la page principale après le traitement
+      header('Location: ' . BASE_URL);
+      die();
+      
+    default:
+      break;
+    }
+  }    
 
 /**
  * Select all tasks from the database.
  */
 // new implementation
-$selectQuery = "SELECT * FROM todo";
+$selectQuery = 'SELECT * FROM todo';
+
+// Exécuter la requête
 $items = $db->query($selectQuery);
 
-// Vérifiez s'il y a des erreurs dans la requête
-if(!$items) {
+// Vérifier s'il y a des erreurs dans la requête
+if (!$items) {
     die(print_r($db->errorInfo(), true));
 }
 
 // Récupérer toutes les tâches sous forme de tableau associatif
 $tasks = $items->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <html>
