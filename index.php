@@ -98,18 +98,13 @@ if (isset($_POST['action'])) {
  * Select all tasks from the database.
  */
 // new implementation
-$selectQuery = 'SELECT * FROM todo';
+$selectQuery = 'SELECT * FROM todo ORDER BY created_at DESC';
+$items = $db->query($selectQuery)->fetchAll(PDO::FETCH_ASSOC);
 
-// Exécuter la requête
-$items = $db->query($selectQuery);
 
-// Vérifier s'il y a des erreurs dans la requête
-if (!$items) {
-    die(print_r($db->errorInfo(), true));
-}
 
-// Récupérer toutes les tâches sous forme de tableau associatif
-$tasks = $items->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 ?>
 
