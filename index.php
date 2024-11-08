@@ -9,7 +9,7 @@ define('BASE_URL', getenv('TODOLIST_BASE_URL') ?: '/');
 
 // Database connection parameters.
 define('DB_USER', getenv('todolist'));
-define('DB_PASS', getenv('12ChevauX!'));
+define('DB_PASS', getenv('TODOLIST_DB_PASS'));
 define('DB_NAME', getenv('todolist'));
 define('DB_HOST', getenv('127.0.0.1'));
 define('DB_PORT', getenv('3306'));
